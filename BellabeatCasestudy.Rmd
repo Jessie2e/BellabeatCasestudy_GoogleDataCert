@@ -500,7 +500,6 @@ ggplot(data = body_changes, mapping = aes(x=entries,y=Weight_change, color=durat
 Wow! 
 
 Another correlation! Though there is a minor difference in BMI and Weight lost, we also know that we only had 30 participants averaging 26.26 days and 25 entries per day. This minor correlation in weight loss is a major breakthrough.  This data suggests that heightened health awareness could lead to substantial improvements. 
-# insert stats about how long it takes to lose weight on average
 
 This insight could position Bellabeat to enhance user health engagement through strategies like contests and notifications. 
 
