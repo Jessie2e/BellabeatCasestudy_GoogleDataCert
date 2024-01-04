@@ -1,0 +1,670 @@
+---
+title: "Bellabeat_Casestudy"
+author: "Jessie Towey"
+date: "2023-12-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Set the CRAN mirror
+options(repos = c(CRAN = "https://cran.r-project.org"))
+# Install required packages
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+```
+  _The following case study was completed as my capstone project for the Google Data Analytics Professional Certification. Thank you for viewing._ 
+
+# **Introduction** 
+
+
+Bellabeat is a tech-driven wellness company dedicated to empowering women through beautifully designed, health-focused smart products. The company collects data on various health aspects, including activity, sleep, stress, and reproductive health, providing women worldwide with valuable insights into their well-being and habits.
+
+With global offices and a diverse product range, Bellabeat has strategically positioned itself in the market. Now, they seek to leverage consumer data analysis to identify growth opportunities and enhance Bellabeat's marketing strategy for smart devices.
+
+---
+
+# **Ask**
+
+_Identifying Key Stakeholders:_
+
+  * Urška Sršen: Bellabeat’s cofounder and Chief Creative Officer
+  * Sando Mur: Bellabeat’s cofounder, mathematician, and key member of executive team
+  * Bellabeat's marketing analytics team
+
+_Questions from Stakeholders:_
+
+  * What are some trends in smart device usage?
+  * How could these trends apply to Bellabeat customers?
+  * How could these trends help influence Bellabeat marketing strategy?
+  
+**Defining Business Task:**
+
+Analyze FitBit Fitness Tracker Data to gain insights into how consumer are using the app and exploring growth opportunities for the Bellabeat marketing strategy.
+
+---
+
+# **Prepare** 
+
+_What Data?_
+
+Fortunately, Urška Sršen provided a data set for exploration:
+
+* [Kaggle FitBit Fitness Tracker Data](https://www.kaggle.com/datasets/arashnic/fitbit) and importing them into R Studio, it is time to begin processing the data!
+  
+  _This data set, collected from 30 eligible Fitbit users through an Amazon Mechanical Turk survey from 03.12.2016 to 05.12.2016, includes minute-level and daily level data on physical activity, heart rate, and sleep. Users provided personal tracker data, and individual reports can be sorted by export session ID (column A) or timestamp (column B), reflecting variations in Fitbit tracker types and individual tracking behaviors._
+
+After downloading the data set from Kaggle, it is time to prepare for, store, and organize it! First, we need to install R Packages to assist our analysis. 
+
+### Installing Packages
+Below are the necessary packages for exploring this data analysis:
+
+* 'here' provides a consistent way of referring to files and directories in your project.
+
+* 'skimr' generates summary statistics and beautiful visualizations for data exploration.
+
+* 'janitor' offers convenient functions for cleaning and analyzing data.
+
+* 'dplyr' is a powerful package for data manipulation and transformation.
+
+* 'tidyverse' is a collection of R packages, including 'dplyr', for data science and visualization.
+
+* 'lubridate' simplifies the handling of dates and times in R.
+
+
+```{r install_packages, echo=FALSE}
+
+install.packages("skimr")
+install.packages("janitor")
+install.packages("dplyr")
+install.packages("tidyverse")
+install.packages("lubridate")
+```
+### Loading Packages
+
+Now it is time to load the packages we installed so that we can use their features and functions! 
+
+```{r loading, echo = FALSE}
+library("here")
+library("skimr")
+library("janitor")
+library("dplyr")
+library("tidyverse")
+library("lubridate")
+```
+### Creating Dataframes
+
+Now that we've completed our preparations for data analysis, it's time to import our data sets. These data sets are currently in CSV (Comma-Separated Value) format and need to be converted into data frames for further processing.
+
+```{r creatingDataframes, echo=FALSE}
+dailyActivity_df <- read_csv("/Users/home/Desktop/jessiesCode/FitabaseData/dailyActivity_merged.csv")
+dailyCalories_df <- read_csv("/Users/home/Desktop/jessiesCode/FitabaseData/dailyCalories_merged.csv")
+dailyIntensities_df <- read_csv("/Users/home/Desktop/jessiesCode/FitabaseData/dailyIntensities_merged.csv")
+dailySteps_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/dailySteps_merged.csv")
+heartrateSeconds_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/heartrate_seconds_merged.csv")
+hourlyCalories_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/hourlyCalories_merged.csv")
+hourlyIntensities_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/hourlyIntensities_merged.csv")
+hourlySteps_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/hourlySteps_merged.csv")
+minuteCaloriesNarrow_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/minuteCaloriesNarrow_merged.csv")
+minuteCaloriesWide_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/minuteCaloriesWide_merged.csv")
+minuteIntensitiesNarrow_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/minuteIntensitiesNarrow_merged.csv")
+minuteIntensitiesWide_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/minuteIntensitiesWide_merged.csv")
+minuteMETsNarrow_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/minuteMETsNarrow_merged.csv")
+minuteSleep_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/minuteSleep_merged.csv")
+minuteStepsNarrow_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/minuteStepsNarrow_merged.csv")
+minuteStepsWide_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/minuteStepsWide_merged.csv")
+sleepDay_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/sleepDay_merged.csv")
+weightLogInfo_df <- read.csv("/Users/home/Desktop/jessiesCode/FitabaseData/weightLogInfo_merged.csv")
+```
+### Absorbing the Data
+
+Now that our data sets are in data frame format, we can start exploring their object types, naming conventions, and structure.
+
+```{r viewdata, echo=TRUE}
+str(dailyActivity_df)
+str(dailyCalories_df)
+str(dailyIntensities_df)
+str(sleepDay_df)
+str(dailySteps_df)
+str(heartrateSeconds_df)
+str(weightLogInfo_df)
+```
+
+### Cleaning/Transforming the Data 
+
+_Naming_:
+
+Upon closer examination of the data sets, we identified opportunities for consistency improvement. Initially, we'll rename sleepDay_df to dailySleep_df to align with other daily dataframe conventions. Additionally, for uniformity, we'll standardize the naming of date or time variables in all dataframes to "Date."
+
+```{r rename, echo=FALSE}
+dailySleep_df <- sleepDay_df
+colnames(dailyActivity_df)[colnames(dailyActivity_df) == "ActivityDate"] <- "Date"
+colnames(dailyCalories_df)[colnames(dailyCalories_df) == "ActivityDay"] <- "Date"
+colnames(dailyIntensities_df)[colnames(dailyIntensities_df) == "ActivityDay"] <- "Date"
+colnames(dailySleep_df)[colnames(dailySleep_df) == "SleepDay"] <- "Date"
+colnames(dailySteps_df)[colnames(dailySteps_df) == "ActivityDay"] <- "Date"
+colnames(heartrateSeconds_df)[colnames(heartrateSeconds_df) == "Time"] <- "Date"
+colnames(weightLogInfo_df)[colnames(weightLogInfo_df) == "Date"] <- "Date"
+```
+_Data Types_:
+
+Using the Structure Function earlier, we also observed that the date variables are currently stored as "chr" (character) data types. To enhance accuracy, it is crucial to convert these date variables to the "date" data type.
+```{r}
+dailyActivity_df$Date <- as.Date(dailyActivity_df$Date, format="%m/%d/%Y")
+dailyCalories_df$Date <- as.Date(dailyCalories_df$Date, format="%m/%d/%Y")
+dailyIntensities_df$Date <- as.Date(dailyIntensities_df$Date, format="%m/%d/%Y")
+dailySleep_df$Date <- as.Date(dailySleep_df$Date, format="%m/%d/%Y")
+dailySteps_df$Date <- as.Date(dailySteps_df$Date, format="%m/%d/%Y")
+heartrateSeconds_df$Date <- as.Date(heartrateSeconds_df$Date, format="%m/%d/%Y")
+weightLogInfo_df$Date <- as.Date(weightLogInfo_df$Date, Date="%m/%d/%Y")
+```
+_Cleaning_:
+
+ 1. Check for null or missing values
+ 
+```{r imputation, echo=TRUE}
+any(is.na(dailyActivity_df))
+any(is.na(dailyCalories_df))
+any(is.na(dailyIntensities_df))
+any(is.na(dailySleep_df))
+any(is.na(dailySteps_df))
+any(is.na(heartrateSeconds_df))
+any(is.na(weightLogInfo_df))
+```
+_It is important to note that the WeightLogInfo_df returned a "TRUE" for null or missing values.  Upon inspection, the variable measuring total 'Fat' lost has many null values.  It is likely not a strong metric to use as we continue to analyse further._
+
+ 2. Remove duplicates for each data frame
+ 
+```{r duplicates, echo=TRUE}
+dailyActivity_df <- distinct(dailyActivity_df)
+dailyCalories_df <- distinct(dailyCalories_df)
+dailyIntensities_df <- distinct(dailyIntensities_df)
+dailySleep_df <- distinct(dailySleep_df)
+dailySteps_df <- distinct(dailySteps_df)
+heartrateSeconds_df <- distinct(heartrateSeconds_df)
+weightLogInfo_df <- distinct(weightLogInfo_df)
+```
+
+### Merging Data
+
+Now that our data is clean and organized, we are ready to perform merges for future analysis. We may need to merge more data when we get further into analysis, but there are a few merges we can make right away! 
+
+Firstly, let's merge the dailyActivity_df with dailySleep_df.
+
+Subsequently, we'll merge dailySleep_df with heartrateSeconds_df. To facilitate this, we need to transform heartrateSeconds_df into a dataframe that represents the average heartrate per user per day.
+
+```{r}
+# Merge dailySleep_df and dailyActivity_df
+activity_sleep <- merge(dailySleep_df, dailyActivity_df, by=c('Id', 'Date'))
+head(activity_sleep)
+
+# Transforming heartrateSeconds_df into a daily heart rate per user data frame
+dailyHeartrate_df <- heartrateSeconds_df %>%
+  group_by(Id, Date) %>%
+  
+  summarise(AverageHeartrate = mean(Value, na.rm = TRUE))
+head(dailyHeartrate_df)
+
+# Now we can combine our daily sleep data with our daily heart rate data! 
+heartrate_sleep <- merge(dailyHeartrate_df, dailySleep_df, by = "Id", all = TRUE)
+head(heartrate_sleep)
+```
+
+---
+
+# **Analyze**
+
+With a few of our data sets fully merged, we can start to explore the data and analyze more visually.
+
+Let's get to exploring! 
+
+## Sample Sizes
+
+_Let's  get to know our sample sizes by breaking down by the number of unique users, the number of entries per health aspect, and the average duration users spent tracking their health._
+
+```{r}
+  # Vector for User Count
+dailyCounts <- c(
+  n_distinct(dailyActivity_df$Id),
+  n_distinct(dailyCalories_df$Id),
+  n_distinct(dailyIntensities_df$Id),
+  n_distinct(dailySleep_df$Id),
+  n_distinct(dailySteps_df$Id),
+  n_distinct(heartrateSeconds_df$Id),
+  n_distinct(weightLogInfo_df$Id))
+# Names for the bars
+daily_bars <- c("Activity", "Calories", "Intensities", "Sleep", "Steps", "Heart", "Weight")
+# Create a data frame with the counts and labels
+df <- data.frame(DataFrame = daily_bars, Count = dailyCounts)
+# Create the bar chart
+ggplot(df, aes(x = DataFrame, y = Count, fill = DataFrame)) +
+  geom_bar(stat = "identity", color = "white", size = 6) +
+  geom_text(aes(label = Count), position = position_stack(vjust = 0.5), size = 6, color = "white") +
+  labs(title = "Distinct User ID by Health Aspect", x = "DataFrame", y = "Count") +
+  theme_minimal()
+```
+
+<span style="color: red;">_It is important to highlight that the Heart and Weight data suffer from limited unique user representation, significantly compromising reliability due to the small sample size._</span>  
+
+Despite the limited number of users in the Heart and Weight data sets, it's worth exploring the frequency of user engagement with the product within the given time frame.
+
+To facilitate this analysis, we can devise a function called calculate_duration. This function, when applied to various health aspect data frames, computes the total number of entries and the duration of user engagement. By doing so, we can generate comprehensive insights into user participation across different health aspects.
+
+```{r}
+# Create a function to calculate the duration and number of entries of recording for each user
+calculate_duration <- function(data) {
+  data %>%
+    group_by(Id) %>%
+    summarise(
+      entries = n(),
+      duration = as.numeric(difftime(max(Date), min(Date), units = "days"))
+    )
+}
+# Apply that function to each data frame
+user_summary_activity <- calculate_duration(dailyActivity_df)
+user_summary_calories <- calculate_duration(dailyCalories_df)
+user_summary_intensities <- calculate_duration(dailyIntensities_df)
+user_summary_sleep <- calculate_duration(dailySleep_df)
+user_summary_steps <- calculate_duration(dailySteps_df)
+user_summary_heartrate <- calculate_duration(dailyHeartrate_df)
+user_summary_weight <- calculate_duration(weightLogInfo_df)
+
+# Combine the results into a single data frame
+user_summary <- bind_rows(
+  mutate(user_summary_activity, Data = "dailyActivity_df"),
+  mutate(user_summary_calories, Data = "dailyCalories_df"),
+  mutate(user_summary_intensities, Data = "dailyIntensities_df"),
+  mutate(user_summary_sleep, Data = "dailySleep_df"),
+  mutate(user_summary_steps, Data = "dailySteps_df"),
+  mutate(user_summary_heartrate, Data = "dailyHeartrate_df"),
+  mutate(user_summary_weight, Data = "weightLogInfo_df")
+)
+head(user_summary)
+
+```
+
+Let's refine our analysis to explore the average number of entries per day per user across different data sets. This will provide insights into the frequency of user engagement with the product over time.
+
+```{r}
+user_dailyAvgEntries <- user_summary %>%
+  group_by(Id) %>%
+  summarise(average_entries = mean(entries))
+print(user_dailyAvgEntries)
+```
+
+Now we can delve into the data to examine the distribution of entries across the various health aspects. This analysis will shed light on the user preferences and indicate whether certain aspects garnered more attention and engagement compared to others.
+
+```{r}
+# Aggregate data by Data type
+data_aggregated <- user_summary %>%
+  group_by(Data) %>%
+  summarise(entries = sum(entries))
+
+# Bar plot for aggregated counts by Data type
+ggplot(data_aggregated, aes(x = Data, y = entries, fill = Data)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = entries), position = position_stack(vjust = 0.5), size = 6, color = "white") +
+  labs(title = "Total Number of Entries by Health Aspect",
+       x = "Data Type", y = "Total Entries") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+_This graph highlights the correlation between the number of unique users, and their total number of entries per health aspect. These graphs are fairly similar in shape regardless of their scale, however, further analysis would be needed to understand how often each user contributed on a more granular level._
+
+Now, let's extend our analysis to calculate the average duration, in days, that users spent engaging with the product. This will offer insights into the overall time commitment and user persistence over the study period.
+
+```{r}
+# Aggregate data by Data type
+data_aggregated <- user_summary %>%
+  drop_na() %>%
+  group_by(Data) %>%
+  summarise(duration = mean(duration))
+
+# Bar plot for aggregated counts by Data type
+ggplot(data_aggregated, aes(x = Data, y = duration, fill = Data)) +
+  geom_bar(stat = "identity") +
+    geom_text(aes(label = round(duration,2)), position = position_stack(vjust = 0.5), size = 3, color = "white") +
+  labs(title = "Average Days Used by Data Type",
+       x = "Data Type", y = "# of Days") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+_Despite the limited total unique user IDs and entries for Heart, Sleep, and Weight data, we observe a relatively even distribution in terms of the average duration each user engaged with the different health aspects. This suggests a consistent duration pattern across different data types over the available time frame._
+
+
+Now that we know more about our sample sizes, let's summarize the key touch points within our selected data sets using the Summary Function. This will help us determine what to look for next. 
+
+## Summary
+
+```{r}
+# activity
+dailyActivity_df %>%  
+  select(TotalSteps,
+         TotalDistance,
+         Calories,SedentaryMinutes, FairlyActiveMinutes, LightlyActiveMinutes, VeryActiveMinutes) %>%
+  summary()
+
+# hourly calories
+dailyCalories_df %>%
+  select(Calories) %>%
+  summary()
+
+# intensities
+dailyIntensities_df %>%
+  select(LightActiveDistance, VeryActiveDistance) %>%
+  summary()
+
+# sleep
+dailySleep_df %>%
+  select(TotalSleepRecords, TotalMinutesAsleep, TotalTimeInBed) %>%
+  summary()
+
+# heart rate
+heartrateSeconds_df %>%
+  select(Value) %>%
+  summary() 
+
+# weight
+weightLogInfo_df %>%
+  select(WeightKg, BMI) %>%
+  summary()
+
+# user info
+user_summary %>%
+  select(entries, duration) %>%
+  summary()
+
+```
+### Key Observations from Summary
+
+* Physical Activity:
+
+Total Steps: 
+The data shows a wide range in total steps, suggesting a diverse user base with varying activity levels. This could inform targeted fitness plans or challenges to engage users.
+
+Total Distance: 
+Users cover a broad distance, indicating different preferences in physical activities. Bellabeat might tailor product features or recommendations based on these preferences.
+
+Calories: 
+The distribution of calories burned highlights variations in users' metabolism and activity intensity. This could be leveraged for personalized fitness guidance or nutritional insights.
+
+Very Active Minutes: 
+The considerable range in very active minutes implies a spectrum of fitness dedication among users. Bellabeat could develop features catering to both beginners and fitness enthusiasts.
+
+* Sleep:
+
+Total Sleep Records: 
+The majority of users have one sleep record, suggesting a consistent sleep tracking pattern. Bellabeat could enhance features related to sleep quality or introduce personalized sleep insights.
+
+Total Minutes Asleep: 
+The diverse range in minutes asleep indicates different sleep durations among users. Bellabeat might offer tailored sleep recommendations or content based on individual needs.
+
+Total Time in Bed: 
+Variability in time spent in bed could be due to lifestyle differences. Bellabeat may provide insights into optimizing sleep routines or adjusting sleep patterns for improved well-being.
+
+* Weight and BMI:
+
+Weight (Kg): 
+The distribution in weight showcases diversity among users. Bellabeat might offer personalized weight management plans or collaborate with health professionals for tailored advice.
+
+BMI: 
+The range in BMI values suggests a mix of body compositions among users. Bellabeat could develop features promoting holistic well-being, considering diverse health goals and body types.
+
+*Data Entries and Duration:
+
+Entries: The consistent number of entries per day could indicate user engagement. Bellabeat may further encourage regular participation or offer incentives to maintain user interest.
+
+Duration: 
+The uniform duration of 30 minutes per day suggests a standardized data collection time frame. But is that enough time to understand health? Bellabeat might consider providing options for flexible data collection periods to accommodate diverse user preferences.
+
+
+_Overall, it is clear that our users have a wide range of different health habits. Now let's explore if there were any changes to our users health aspects over time!_
+
+**Key Questions to Explore**
+
+  * _Exploring Health and Weight: Given the significance of the weight loss industry, what correlations exist between various health aspects and metrics such as calories burned, BMI changes, and weight changes?_
+
+  * _Sleep and Health Correlations: Are there discernible correlations between sleep patterns and different health aspects, shedding light on the impact of sleep on overall well-being?_
+
+  * _Product Usage and Health Impacts: Do patterns of product usage show any correlations with changes in health aspects? Investigating whether engagement with the product relates to increases or decreases in specific health metrics provides valuable insights into user behavior and product effectiveness._
+  
+
+## Visualizng Patters
+
+
+First, let's look at *Usage*.
+
+We will start by analyzing user BMI. Using ggplot, I'll visually represent the relationship between user entries, BMI change, and duration, with a color gradient indicating the duration.
+
+```{r}
+# Create a data frame to show difference in weight by user Id
+weightChange_pd <- weightLogInfo_df %>%
+  group_by(Id) %>%
+  summarise(
+    FirstWeight = first(WeightPounds),
+    LastWeight = last(WeightPounds)
+  ) %>%
+  mutate(Difference = LastWeight - FirstWeight)
+# Create a data frame to show difference in BMI by user Id
+weightChange_bmi <- weightLogInfo_df %>%
+  group_by(Id) %>%
+  summarise(
+    FirstBMI = first(BMI),
+    LastBMI = last(BMI)
+    )%>%
+  mutate(Difference = LastBMI - FirstBMI)
+
+# Let's merge these new data frames with the user_summary data frame for earlier. First we need some vectors:
+columns_to_select_user_summary <- c("Id", "entries", "duration")
+columns_to_select_weightChange_bmi <- c("Id", "Difference")
+columns_to_select_weightChange_pd <- c("Id", "Difference")
+
+# Select specific columns from each data frame
+selected_user_summary <- user_summary %>%
+  select(columns_to_select_user_summary)
+
+selected_weightChange_bmi <- weightChange_bmi %>%
+  select(columns_to_select_weightChange_bmi)
+
+selected_weightChange_pd <- weightChange_pd %>%
+  select(columns_to_select_weightChange_pd)
+
+# Merge the selected data frames
+body_changes <- merge(merge(selected_user_summary, selected_weightChange_bmi, by='Id'), selected_weightChange_pd, by='Id')
+colnames(body_changes)[colnames(body_changes) == "Difference.x"] <- "BMI_change"
+colnames(body_changes)[colnames(body_changes) == "Difference.y"] <- "Weight_change"
+
+# Time to create your visualizations! First, BMI:
+ggplot(data = body_changes, mapping = aes(x=entries,y=BMI_change, color=duration)) +
+  geom_point() +
+  geom_smooth(method="lm",color="#BB7CFB") +
+  labs(title="Entries vs. BMI Change",x="# of Entries",y="Change in BMI")+
+  scale_color_gradient(low="#FCE57B",high="#FDA8EB")
+```
+
+Wow, though it is small, there does seem to be a correlation between the change in BMI and # of entries! It looks like users engaging in more entries lost more BMI. 
+
+How did users engage with the *weight* health aspect? 
+
+```{r}
+ggplot(data = body_changes, mapping = aes(x=entries,y=Weight_change, color=duration)) +
+  geom_point() +
+  geom_smooth(method="lm",color="#BB7CFB") +
+  labs(title="Entries vs. Weight Change",x="# of Entries",y="Change in Weight (Pds)")+
+  scale_color_gradient(low="#FCE57B",high="#FDA8EB")
+```
+
+Wow! 
+
+Another correlation! Though there is a minor difference in BMI and Weight lost, we also know that we only had 30 participants averaging 26.26 days and 25 entries per day. This minor correlation in weight loss is a major breakthrough.  This data suggests that heightened health awareness could lead to substantial improvements. 
+# insert stats about how long it takes to lose weight on average
+
+This insight could position Bellabeat to enhance user health engagement through strategies like contests and notifications. 
+
+Let's see if we continue to see similar results with *calories* and # of entries per user Id. 
+
+```{r}
+# Entries vs Calories 
+# Create a dataframe to get the total calories burned per user Id
+total_calories_per_id <- dailyActivity_df %>%
+  group_by(Id) %>%
+  summarise(TotalCalories = sum(Calories, na.rm = TRUE))
+
+#remove duplicates
+usage_calories <- left_join(user_summary %>% select(-Data), total_calories_per_id, by = "Id")
+usage_calories <- usage_calories %>% distinct(Id, .keep_all = TRUE)
+
+
+ggplot(data = usage_calories, aes(x = TotalCalories, y = entries, color = duration)) + 
+  geom_point() + 
+  geom_smooth(method = 'lm', formula = y ~ poly(x, 2), se = FALSE, color = "#BB7CFB") + 
+  labs(title = "Entries vs. Calories") +
+  scale_color_gradient(low="#FCE57B",high="#FDA8EB")
+```
+
+Incredible! We have yet another correlation towards the number of entries per user and a health aspect.  The visualization above shows a clear indication that the more engaged a user was with their health aspects, the more calories they burned!
+
+
+_Note: During the analysis, correlations between weight/BMI, and heart rate data were explored. However, there was very low sample size of users contributing to both heart rate and weight/BMI data, which limited the ability to establish significant correlations between the two._
+
+Now, let's turn our focus to the **sleep** data, leveraging the merged data sets for deeper exploration! 
+
+
+```{r}
+ggplot(data = activity_sleep, mapping = aes(x=TotalMinutesAsleep,y=SedentaryMinutes, color=TrackerDistance)) +
+  geom_point() +
+  geom_smooth(method="lm",color="#5a5c69") +
+  labs(title="Total Minutes Asleep vs. Sedentary Minutes",x="Total Minutes Asleep",y="Sedentary Minutes")+
+  scale_color_gradient(low="#fa70f3",high="#422d9e")
+
+ggplot(data = activity_sleep, mapping = aes(x=TotalMinutesAsleep,y=VeryActiveMinutes, color=TrackerDistance)) +
+  geom_point() +
+  geom_smooth(method="lm",color="#5a5c69") +
+  labs(title="Total Minutes Asleep vs. Very Active Minutes",x="Total Minutes Asleep",y="VeryActiveMinutes")+
+  scale_color_gradient(low="#fa70f3",high="#422d9e")
+
+ggplot(data = activity_sleep, mapping = aes(x=TotalMinutesAsleep,y=TotalDistance, color=Calories)) +
+  geom_point() +
+  geom_smooth(method="lm",color="#5a5c69") +
+  labs(title="Total Minutes Asleep vs. Total Distance",x="Total Minutes Asleep",y="Total Distance")+
+  scale_color_gradient(low="#fa70f3",high="#422d9e")
+```
+ 
+ 
+  1. Our first sleep graph suggests a potential negative correlation between sedentary behavior and total sleep duration.This pattern may imply that individuals who sleep more tend to be less sedentary, and vice versa. 
+
+  2. Our second sleep graph suggests a potential negative correlation between very active minutes and total sleep time which could imply that being TOO active could cause less sleep.
+
+  3. Our third sleep graph suggests a potential negative correlation between the distance a user broached and their total sleep time.  This could also imply that being too active could cause less sleep.
+
+These are interesting findings and it is important to note that correlation does not imply causation, and additional analysis would be needed to draw more definitive conclusions. For instance: perhaps people are not prioritizing their sleep in order to socialize, or perhaps people work difficult working hours. 
+
+Let's see if we see the same results when we look at activity levels in a different way.  Lets move on to **calories**! 
+```{r}
+custom_colors <- c("#FEE6EB", "#FDA8EB", "#BB7CFB", "#6CE2B6", "#FCE57B","#FE846C")
+
+# Calories versus Steps
+ggplot(data = dailyActivity_df, aes(x = TotalSteps, y = Calories)) + 
+  geom_point(color = custom_colors[2]) + 
+  geom_smooth(color = custom_colors[3]) +  # You can adjust the color of the smooth line
+  labs(title = "Calories and Steps") +
+  scale_color_manual(values = custom_colors)
+
+# Calories and Very Active Minutes
+ggplot(data = dailyActivity_df, aes(x = VeryActiveMinutes, y = Calories)) + 
+  geom_point(color = custom_colors[4]) + 
+  geom_smooth(color = custom_colors[3]) + 
+  labs(title = "Calories and Very Active Minutes")
+
+#Calories and Total Distance 
+usage_calories <- usage_calories %>%
+  left_join(dailyActivity_df %>% 
+              group_by(Id) %>%
+              summarise(total_distance = sum(TotalDistance)),
+            by = "Id")
+
+ggplot(data = usage_calories, aes(x = TotalCalories, y = total_distance)) +
+  geom_point(color = custom_colors[6]) +
+  geom_smooth(color = custom_colors[3]) +
+  labs(title = "Calories and Distance")
+
+# Percent Spent in Different Active States
+
+    VeryActive <- mean(dailyActivity_df$VeryActiveMinutes)
+    FairlyActive <- mean(dailyActivity_df$FairlyActiveMinutes)
+    LightlyActive <- mean(dailyActivity_df$LightlyActiveMinutes)
+    Sedentary <- mean(dailyActivity_df$SedentaryMinutes)
+  
+    activityLevels <- c(VeryActive, FairlyActive, LightlyActive, Sedentary)
+
+# Create a pie chart
+pie(activityLevels, labels = c("VeryActiveMinutes","FairlyActiveMinutes","LightlyActiveMinutes","Sedentary"), 
+    main = "Activity Levels", col = rainbow(length(activityLevels)), cex = 0.7)
+
+
+```
+
+As you can see, there is a great correlation between calories and the different health activity you might engage in, signifying there is really nothing to lose if you are moving you body! 
+
+Sadly though, it does look like many of the users spent the largest amount of their time in fairly inactive states.  
+
+Before we recap our final conclusions, let's take a look at our *user engagement per day*! This will help inform us to make the best recommendations possible. 
+
+
+```{r}
+#First, we need to add a column to our dailyActivity_df that tells us what day of the week it is. 
+dailyActivity_df <- dailyActivity_df %>%
+  mutate(weekday = weekdays(as.Date(Date,"%m/%d/%Y")))
+glimpse(dailyActivity_df)
+
+# create an order
+dailyActivity_df$weekday <- ordered(dailyActivity_df$weekday, levels=c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"))
+# create a new data frame to gain the counts per day
+weekdayCounts <- dailyActivity_df %>% 
+  group_by(weekday) %>% 
+  summarize(count_of = n())
+#create your graph to visualize the findings
+ggplot(weekdayCounts, aes(x=weekday, y=count_of))+
+  geom_bar(stat="identity",color="gray",fill="#BB7CFB") +
+  labs(title="User Count Across Weekday", x="Day of the Week", y="Count") +
+  geom_label(aes(label=count_of),color="black")
+
+```
+
+It is not shocking to see that users tend to struggle engaging with their health aspects on the weekend and Mondays.  Perhaps there is something Bellabeat could do to increase weekend/Monday engagement and increase their user's wellness overall! Let's talk conclusions! 
+
+---
+
+# *Recommendations*
+
+**1. CDC Step Widget:**
+Bellabeat should motivate users to aim for at least 8,000 steps per day, emphasizing the    associated health benefits and the CDC's findings on mortality risk reduction. This could be done by creating an app widget that showed a pie graph of how many steps a user has taken out of the 8,000 each day. 
+  
+**2. Weight Loss Support:**
+Provide users with low-calorie lunch and dinner ideas, offering dietary suggestions to aid those seeking weight loss. Incorporate a feature for users to log their daily meals, enabling them to track their eating habits and manage caloric intake for weight-related goals.  This could increase engagement in the Weight health aspect category.
+
+**3. Sleep Improvement Notifications:**
+Utilize app notifications to remind users to go to bed at optimal times, supporting better sleep hygiene and overall well-being. Increase the tracking offered for the sleep health aspect by tracking the number of times a user woke up, the number of times a user snored, and the percentage in REM, deep sleep and light sleep.    
+
+**4. Promote Physical Activity Friday-Monday:**
+Leverage the data indicating increased activity between 5 pm and 7 pm to send motivational notifications encouraging users to engage in physical activities like running or walking during these hours. Partner with brands to create giveaways for users with the most steps between certain hour. 
+
+**5. Reduce Sedentary Time for Better Sleep:**
+Recommend strategies to reduce sedentary time for users looking to improve their sleep quality, highlighting the correlation between reduced sedentary behavior and better sleep.
+
+**6. Expand Exercise Programs:**
+Conduct research gathering insights about Bellabeat users' preferred exercise routines, and introduce more diverse exercising programs within the app to cater to different user preferences and fitness levels. 
+
+**7. Post-Work Motivational Quotes:**
+Send motivational quotes or messages during the peak activity hours after office hours to inspire users to engage in physical activities like going to the gym or taking a walk.
+
+**8. Overall Health Summaries and Reports:**
+Create Weekly/Monthly health recaps that highlight user engagement and different health milestones!
+
+---
+
+_**A word from the author:** Thank you so much for viewing and engaging in this analysis project with me. This is my very first R project and I truly learned so much.  Please feel free to leave any comments or suggestions for improvement. I would love to have you as a part of my data analysis network and journey!_
+
